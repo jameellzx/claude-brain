@@ -1,0 +1,13 @@
+# Personal data — stays on this PC only
+/goals.md
+/tasks.md
+/sessions.md
+/state.json
+/log/
+/outputs/
+
+# Debug / temp
+*.log
+scripts/dbg*
+scripts/debug*
+.env
