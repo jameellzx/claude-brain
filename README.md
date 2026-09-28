@@ -36,11 +36,21 @@ It's plain files plus Claude Code features: skills, scheduled tasks, memory and 
    5. If the terminal Claude isn't logged in, double-click **Log in Claude (terminal).bat**.
    6. Double-click **Start Brain (Telegram).bat**, then DM your bot. It replies with a pairing code. Pair with `/telegram:access pair <code>`, then run `/telegram:access policy allowlist`.
 
+## Make it automatic (optional)
+
+- **Brief every Claude session.** Add these to `%USERPROFILE%\.claude\settings.json` under `hooks`. Every new session then gets your priorities and today's tasks, and each finished session is logged to `log/activity.log`:
+  ```json
+  "SessionStart": [{ "matcher": "", "hooks": [{ "type": "command", "command": "python \"C:\\dev\\brain\\scripts\\brain_hook.py\" start", "timeout": 10 }] }],
+  "SessionEnd":   [{ "matcher": "", "hooks": [{ "type": "command", "command": "python \"C:\\dev\\brain\\scripts\\brain_hook.py\" end", "timeout": 10 }] }]
+  ```
+- **Start with Windows.** Put a shortcut to `Start Brain (Telegram).bat` in your Startup folder (`shell:startup`). Add the argument `auto` so it waits for the network, and set it to run minimized. Add the Claude app to startup too, so scheduled briefs run.
+- **Keep Telegram on the brain only.** Leave the plugin disabled at user level (`"telegram@claude-plugins-official": false`). This repo's `.claude/settings.json` enables it just for this folder. If every session loads it, each new session takes the bot over from the brain.
+
 ## Launcher gotchas (already handled in the .bat files)
 
 - **Stale login from other sessions:** the launcher clears inherited `CLAUDE*` environment variables. Otherwise a window opened from another Claude session can fail with `401 OAuth access token has expired`.
 - **Prompt placement:** the startup prompt goes *before* `--channels`, because that flag takes a variable number of values and swallows anything after it.
-- **One window only:** run a single launcher. Two pollers on one bot token conflict.
+- **One window only:** the launcher refuses to start a second copy. Two pollers on one bot token conflict.
 - **Bun on PATH:** Bun's winget folder is added to PATH, because Explorer may not see the new PATH until you log out and back in.
 
 ## Files

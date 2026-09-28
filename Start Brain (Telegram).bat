@@ -1,5 +1,14 @@
 @echo off
 title Brain (Telegram)
+rem Only one brain may run: two copies fight over the Telegram bot.
+powershell -NoProfile -Command "if (Get-CimInstance Win32_Process -Filter \"Name='claude.exe'\" | Where-Object { $_.CommandLine -match 'channels plugin:telegram' }) { exit 1 }"
+if errorlevel 1 (
+  echo The Brain is already running. Nothing to do.
+  timeout /t 5 >nul
+  exit /b
+)
+rem When started by Windows at login, wait for the network first.
+if /i "%~1"=="auto" timeout /t 45 /nobreak >nul
 rem Clear settings inherited from other Claude sessions so this window uses its own login.
 for /f "delims==" %%V in ('set CLAUDE 2^>nul') do set "%%V="
 set "ANTHROPIC_BASE_URL="
